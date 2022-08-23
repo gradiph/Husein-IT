@@ -454,4 +454,5 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 
 # private data
+appsettings.json
 appsettings.*.json

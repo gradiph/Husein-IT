@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Husein IT Web", "Husein IT Web\Husein IT Web.csproj", "{D2ACDF35-F327-4E66-B7B4-1861613EC9AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Husein IT Web", "Husein IT Web\Husein IT Web.csproj", "{D2ACDF35-F327-4E66-B7B4-1861613EC9AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageBus", "MessageBus\MessageBus.csproj", "{5B5AC730-9BA0-4691-9120-57F608C96658}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D2ACDF35-F327-4E66-B7B4-1861613EC9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2ACDF35-F327-4E66-B7B4-1861613EC9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D2ACDF35-F327-4E66-B7B4-1861613EC9AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B5AC730-9BA0-4691-9120-57F608C96658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B5AC730-9BA0-4691-9120-57F608C96658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B5AC730-9BA0-4691-9120-57F608C96658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B5AC730-9BA0-4691-9120-57F608C96658}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
