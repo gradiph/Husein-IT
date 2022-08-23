@@ -9,5 +9,6 @@ namespace MessageBus
 
         public DbSet<Channel> Channels { get; set; }
         public DbSet<Subscriber> Subscribers { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }
