@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public virtual List<Subscriber> Subscribers { get; set; }
+        public List<Subscriber> Subscribers { get; set; }
     }
 }

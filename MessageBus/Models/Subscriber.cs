@@ -1,17 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MessageBus.Models
 {
     public class Subscriber
     {
         public int Id { get; set; }
-
-        [Column(TypeName = "varchar(255)")]
         public string Name { get; set; }
-
-        [Column(TypeName = "varchar(255)")]
         public string Url { get; set; }
 
-        public virtual Channel Channel { get; set; }
+        [JsonIgnore]
+        public Channel Channel { get; set; }
+        public int ChannelId { get; set; }
     }
 }

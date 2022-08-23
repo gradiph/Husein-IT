@@ -1,4 +1,5 @@
 global using MessageBus;
+using MessageBus.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,8 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 var dockerConnectionString = builder.Configuration.GetConnectionString("Docker");
 var migrationConnectionString = builder.Configuration.GetConnectionString("Migration");
 builder.Services.AddDbContext<DataContext>(options =>
-    //options.UseMySql(dockerConnectionString, ServerVersion.AutoDetect(dockerConnectionString))
-    options.UseMySql(migrationConnectionString, ServerVersion.AutoDetect(migrationConnectionString))
+    options.UseMySql(dockerConnectionString, ServerVersion.AutoDetect(dockerConnectionString))
+    //options.UseMySql(migrationConnectionString, ServerVersion.AutoDetect(migrationConnectionString))
 );
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -26,9 +27,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/channels", (DataContext db) =>
+app.MapGet("/channels", async (DataContext db) =>
 {
-    return db.Channels.ToList();
+    return await db.Channels.Include(o => o.Subscribers).ToListAsync();
 });
 
 app.Run();

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MessageBus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220823073556_AddChannelAndSubscriber")]
+    [Migration("20220823145055_AddChannelAndSubscriber")]
     partial class AddChannelAndSubscriber
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,10 @@ namespace MessageBus.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Url")
                         .IsRequired()
                         .HasColumnType("longtext");
 
