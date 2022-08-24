@@ -1,4 +1,4 @@
-﻿namespace MessageBus.FormRequests
+﻿namespace CommonMessage.FormRequest
 {
     public class PostPublish
     {
