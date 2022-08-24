@@ -3,6 +3,7 @@ using System;
 using MessageBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MessageBus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220824005058_MessageSubscriberRelation")]
+    partial class MessageSubscriberRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -67,8 +69,8 @@ namespace MessageBus.Migrations
                         .HasColumnType("int")
                         .HasColumnOrder(1);
 
-                    b.Property<DateTime?>("SentAt")
-                        .HasColumnType("datetime(6)");
+                    b.Property<bool>("IsSent")
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("MessageId", "SubscriberId");
 
