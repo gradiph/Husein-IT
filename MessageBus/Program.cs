@@ -74,21 +74,4 @@ app.MapPost("/publish", async (DataContext db, PostPublish request) =>
     return Results.Ok();
 });
 
-//app.MapPost("/subscribe", async (DataContext db, PostSubscribe request) =>
-//{
-//    var channel = await db.Channels.FindAsync(request.ChannelId);
-//    if (channel == null)
-//    {
-//        return Results.BadRequest();
-//    }
-
-//    var subscriber = await db.Subscribers.FindAsync(request.SubscriberId);
-//    if (subscriber == null)
-//    {
-//        return Results.BadRequest();
-//    }
-
-//    db.MessageSubscribers.Add
-//});
-
 app.Run();
