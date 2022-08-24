@@ -1,4 +1,5 @@
 global using MessageBus;
+using MessageBus.FormRequests;
 using MessageBus.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,12 +37,22 @@ app.MapGet("/channels", async (DataContext db) =>
     return Results.Ok(channels);
 });
 
-app.MapPost("/publish", async (DataContext db, Message message) =>
+app.MapPost("/publish", async (DataContext db, PostPublish request) =>
 {
+    var channel = await db.Channels.FindAsync(request.ChannelId);
+    if (channel == null)
+    {
+        return Results.BadRequest("channel is not found");
+    }
+
+    var message = new Message();
+    message.PublisherName = request.Name;
+    message.Channel = channel;
+
     db.Messages.Add(message);
 
     var subscribers = await db.Subscribers
-        .Where(s => s.ChannelId == message.ChannelId)
+        .Where(s => s.Channel == message.Channel)
         .ToListAsync();
 
     foreach (var subscriber in subscribers)
@@ -55,5 +66,15 @@ app.MapPost("/publish", async (DataContext db, Message message) =>
 
     return Results.Ok();
 });
+
+//app.MapPost("/subscribe", async (DataContext db, Subscriber request_subscriber) => {
+//    var channel = await db.Channels.FindAsync(request_subscriber.ChannelId);
+//    if (channel == null)
+//    {
+//        return Results.BadRequest();
+//    }
+
+//    var dbSubscriber = db.Subscribers.
+//});
 
 app.Run();
