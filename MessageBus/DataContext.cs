@@ -12,6 +12,7 @@ namespace MessageBus
                 table.MessageId,
                 table.SubscriberId
             });
+            builder.Entity<Subscriber>().HasIndex(s => s.Code).IsUnique();
         }
 
         public DbSet<Channel> Channels { get; set; }

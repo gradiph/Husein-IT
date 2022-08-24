@@ -1,5 +1,5 @@
-global using MessageBus;
-using MessageBus.FormRequests;
+using MessageBus;
+using CommonMessage.FormRequest;
 using MessageBus.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +37,15 @@ app.MapGet("/channels", async (DataContext db) =>
     return Results.Ok(channels);
 });
 
+app.MapGet("/subscribers", async (DataContext db) =>
+{
+    var subscribers = await db.Subscribers
+        .Include(s => s.Channels)
+        .Include(s => s.Messages)
+        .ToListAsync();
+    return Results.Ok(subscribers);
+});
+
 app.MapPost("/publish", async (DataContext db, PostPublish request) =>
 {
     var channel = await db.Channels.FindAsync(request.ChannelId);
@@ -51,9 +60,7 @@ app.MapPost("/publish", async (DataContext db, PostPublish request) =>
 
     db.Messages.Add(message);
 
-    var subscribers = await db.Subscribers
-        .Where(s => s.Channel == message.Channel)
-        .ToListAsync();
+    var subscribers = channel.Subscribers;
 
     foreach (var subscriber in subscribers)
     {
@@ -67,14 +74,21 @@ app.MapPost("/publish", async (DataContext db, PostPublish request) =>
     return Results.Ok();
 });
 
-//app.MapPost("/subscribe", async (DataContext db, Subscriber request_subscriber) => {
-//    var channel = await db.Channels.FindAsync(request_subscriber.ChannelId);
+//app.MapPost("/subscribe", async (DataContext db, PostSubscribe request) =>
+//{
+//    var channel = await db.Channels.FindAsync(request.ChannelId);
 //    if (channel == null)
 //    {
 //        return Results.BadRequest();
 //    }
 
-//    var dbSubscriber = db.Subscribers.
+//    var subscriber = await db.Subscribers.FindAsync(request.SubscriberId);
+//    if (subscriber == null)
+//    {
+//        return Results.BadRequest();
+//    }
+
+//    db.MessageSubscribers.Add
 //});
 
 app.Run();
