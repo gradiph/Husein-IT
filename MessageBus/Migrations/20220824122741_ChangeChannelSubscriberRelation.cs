@@ -4,7 +4,7 @@
 
 namespace MessageBus.Migrations
 {
-    public partial class changeChannelSubscriberRelation : Migration
+    public partial class ChangeChannelSubscriberRelation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -16,13 +16,9 @@ namespace MessageBus.Migrations
                 name: "IX_Subscribers_ChannelId",
                 table: "Subscribers");
 
-            migrationBuilder.AddColumn<string>(
-                name: "Code",
-                table: "Subscribers",
-                type: "varchar(255)",
-                nullable: false,
-                defaultValue: "")
-                .Annotation("MySql:CharSet", "utf8mb4");
+            migrationBuilder.DropColumn(
+                name: "ChannelId",
+                table: "Subscribers");
 
             migrationBuilder.CreateTable(
                 name: "ChannelSubscriber",
@@ -50,12 +46,6 @@ namespace MessageBus.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscribers_Code",
-                table: "Subscribers",
-                column: "Code",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ChannelSubscriber_SubscribersId",
                 table: "ChannelSubscriber",
                 column: "SubscribersId");
@@ -66,13 +56,12 @@ namespace MessageBus.Migrations
             migrationBuilder.DropTable(
                 name: "ChannelSubscriber");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Subscribers_Code",
-                table: "Subscribers");
-
-            migrationBuilder.DropColumn(
-                name: "Code",
-                table: "Subscribers");
+            migrationBuilder.AddColumn<int>(
+                name: "ChannelId",
+                table: "Subscribers",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subscribers_ChannelId",

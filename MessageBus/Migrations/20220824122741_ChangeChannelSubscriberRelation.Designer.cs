@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MessageBus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220824110043_changeChannelSubscriberRelation")]
-    partial class changeChannelSubscriberRelation
+    [Migration("20220824122741_ChangeChannelSubscriberRelation")]
+    partial class ChangeChannelSubscriberRelation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -100,13 +100,6 @@ namespace MessageBus.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -116,9 +109,6 @@ namespace MessageBus.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
 
                     b.ToTable("Subscribers");
                 });
