@@ -8,11 +8,10 @@ namespace MessageBus.Models
         public int Id { get; set; }
         public string PublisherName { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public string Data { get; set; }
+
         [Required]
-        public int ChannelId { get; set; }
-        [JsonIgnore]
-        public virtual Channel Channel { get; set; }
-        [JsonIgnore]
-        public virtual ICollection<MessageSubscriber> Subscribers { get; set; }
+        public Channel Channel { get; set; }
+        public ICollection<MessageSubscriber> Subscribers { get; set; }
     }
 }

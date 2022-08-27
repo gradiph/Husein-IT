@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MessageBus.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220824005058_MessageSubscriberRelation")]
-    partial class MessageSubscriberRelation
+    [Migration("20220826003725_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,21 @@ namespace MessageBus.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("ChannelSubscriber", b =>
+                {
+                    b.Property<int>("ChannelsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SubscribersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ChannelsId", "SubscribersId");
+
+                    b.HasIndex("SubscribersId");
+
+                    b.ToTable("ChannelSubscriber");
+                });
 
             modelBuilder.Entity("MessageBus.Models.Channel", b =>
                 {
@@ -48,6 +63,10 @@ namespace MessageBus.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PublisherName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -69,8 +88,8 @@ namespace MessageBus.Migrations
                         .HasColumnType("int")
                         .HasColumnOrder(1);
 
-                    b.Property<bool>("IsSent")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("MessageId", "SubscriberId");
 
@@ -85,9 +104,6 @@ namespace MessageBus.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ChannelId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -98,9 +114,22 @@ namespace MessageBus.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChannelId");
-
                     b.ToTable("Subscribers");
+                });
+
+            modelBuilder.Entity("ChannelSubscriber", b =>
+                {
+                    b.HasOne("MessageBus.Models.Channel", null)
+                        .WithMany()
+                        .HasForeignKey("ChannelsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MessageBus.Models.Subscriber", null)
+                        .WithMany()
+                        .HasForeignKey("SubscribersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MessageBus.Models.Message", b =>
@@ -133,22 +162,9 @@ namespace MessageBus.Migrations
                     b.Navigation("Subscriber");
                 });
 
-            modelBuilder.Entity("MessageBus.Models.Subscriber", b =>
-                {
-                    b.HasOne("MessageBus.Models.Channel", "Channel")
-                        .WithMany("Subscribers")
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-                });
-
             modelBuilder.Entity("MessageBus.Models.Channel", b =>
                 {
                     b.Navigation("Messages");
-
-                    b.Navigation("Subscribers");
                 });
 
             modelBuilder.Entity("MessageBus.Models.Message", b =>

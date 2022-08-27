@@ -9,9 +9,7 @@ namespace MessageBus.Models
         public string Name { get; set; }
         public string Url { get; set; }
 
-        [JsonIgnore]
-        public virtual ICollection<Channel> Channels { get; set; }
-        [JsonIgnore]
-        public virtual ICollection<MessageSubscriber> Messages { get; set; }
+        public ICollection<Channel> Channels { get; set; }
+        public ICollection<MessageSubscriber> Messages { get; set; }
     }
 }

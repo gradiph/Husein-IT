@@ -61,6 +61,10 @@ namespace MessageBus.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PublisherName")
                         .IsRequired()
                         .HasColumnType("longtext");

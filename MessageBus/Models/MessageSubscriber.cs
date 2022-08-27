@@ -10,10 +10,8 @@ namespace MessageBus.Models
         public int MessageId { get; set; }
         [Key, Column(Order = 1)]
         public int SubscriberId { get; set; }
-        [JsonIgnore]
-        public virtual Message Message { get; set; }
-        [JsonIgnore]
-        public virtual Subscriber Subscriber { get; set; }
+        public Message Message { get; set; }
+        public Subscriber Subscriber { get; set; }
         public DateTime? SentAt { get; set; }
     }
 }
