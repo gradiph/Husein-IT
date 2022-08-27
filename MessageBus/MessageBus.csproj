@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CommonJson\CommonJson.csproj" />
     <ProjectReference Include="..\CommonMessage\CommonMessage.csproj" />
   </ItemGroup>
 
