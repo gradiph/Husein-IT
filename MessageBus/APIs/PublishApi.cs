@@ -1,5 +1,6 @@
 ﻿using CommonMessage.FormRequest;
 using MessageBus.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MessageBus.APIs
 {
@@ -9,7 +10,8 @@ namespace MessageBus.APIs
         {
             app.MapPost("/publish", async (DataContext db, PostPublish request) =>
             {
-                var channel = await db.Channels.FindAsync(request.ChannelId);
+                var channel = await db.Channels
+                    .FindAsync(request.ChannelId);
                 if (channel == null)
                 {
                     return Results.BadRequest("channel is not found");
@@ -21,7 +23,7 @@ namespace MessageBus.APIs
 
                 db.Messages.Add(message);
 
-                var subscribers = channel.Subscribers;
+                var subscribers = await db.Subscribers.Where(s => s.Channels == channel).ToListAsync();
 
                 foreach (var subscriber in subscribers)
                 {

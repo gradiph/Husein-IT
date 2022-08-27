@@ -1,30 +1,11 @@
 using MessageBus;
 using MessageBus.APIs;
-using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+var app = WebApplication.CreateBuilder(args)
+    .RegisterServices()
+    .Build();
 
-// Add services to the container.
-var dockerConnectionString = builder.Configuration.GetConnectionString("Docker");
-builder.Services.AddDbContext<DataContext>(options =>
-options.UseMySql(dockerConnectionString, ServerVersion.AutoDetect(dockerConnectionString))
-);
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
+app.RegisterMiddleware();
 app.RegisterSubscriberApi();
 app.RegisterChannelApi();
 app.RegisterPublishApi();
