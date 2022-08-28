@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using CommonJson;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MessageBus.APIs
 {
@@ -11,19 +12,33 @@ namespace MessageBus.APIs
         public static void RegisterChannelApi(this WebApplication app)
         {
             app.MapGet("/channels", GetAllChannels);
+            app.MapGet("/channel", GetChannel);
         }
 
-        public async static Task<List<Channel>> GetAllChannels(DataContext db)
+        public async static Task<IResult> GetAllChannels(DataContext db)
         {
-            var channels = await db.Channels.ToListAsync();
-            List<Channel> channelsList = new JsonResponseBuilder(channels).Build<List<Channel>>();
-            return channelsList;
+            List<Channel> channels = await db.Channels.ToListAsync();
+            List<Channel> response = new JsonResponseBuilder(channels).Build<List<Channel>>();
+            return Results.Ok(response);
         }
 
-        public async static Task<Channel> GetChannel(DataContext db)
+        public async static Task<IResult> GetChannel(DataContext db, int id)
         {
-            var channel = await db.Channels.FirstOrDefaultAsync();
-            return channel;
+            Channel channel;
+            try
+            {
+                channel = await db.Channels
+                    .Where(c => c.Id == id)
+                    .Include(c => c.Subscribers)
+                    .Include(c => c.Messages)
+                    .FirstAsync();
+            }
+            catch (Exception)
+            {
+                return Results.BadRequest("No channel with id " + id);
+            }
+            Channel response = new JsonResponseBuilder(channel).Build<Channel>();
+            return Results.Ok(response);
         }
     }
 }
