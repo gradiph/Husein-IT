@@ -40,7 +40,7 @@ namespace CommonLog
         }
         private string GetFormattedMessage(string message)
         {
-            string date = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss.fff]");
+            string date = DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss.fff zzz]");
             string formattedMessage = string.Join(" ", new string[] { date, message });
             return formattedMessage;
         }
