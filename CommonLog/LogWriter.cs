@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace CommonLog
@@ -26,6 +27,31 @@ namespace CommonLog
                 using var writer = File.CreateText(filepath);
                 await writer.WriteLineAsync(formattedMessage);
             }
+        }
+
+        public async void LogAsync(object caller, LogType logType, string message, Exception exception)
+        {
+            var nameSpace = GetNameSpace(caller);
+
+            var filepath = GetFilePath(nameSpace, logType);
+            var formattedMessage = GetFormattedMessage(message);
+            if (File.Exists(filepath))
+            {
+                using var writer = File.AppendText(filepath);
+                await writer.WriteLineAsync(formattedMessage);
+                await WriteStackTrace(writer, exception);
+            }
+            else
+            {
+                using var writer = File.CreateText(filepath);
+                await writer.WriteLineAsync(formattedMessage);
+                await WriteStackTrace(writer, exception);
+            }
+        }
+
+        private async Task WriteStackTrace(StreamWriter writer, Exception exception)
+        {
+            await writer.WriteLineAsync(exception.ToString());
         }
 
         private string GetNameSpace(object caller)
