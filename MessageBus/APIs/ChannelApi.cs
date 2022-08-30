@@ -1,8 +1,8 @@
 ﻿using CommonJson;
 using CommonLog;
 using MessageBus.Models;
+using MessageBus.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace MessageBus.APIs
 {
@@ -11,7 +11,8 @@ namespace MessageBus.APIs
         public static void RegisterChannelApi(this WebApplication app)
         {
             app.MapGet("/channels", GetAllChannels);
-            app.MapGet("/channel", GetChannel);
+            app.MapGet("/channel/{id}", GetChannel);
+            app.MapPost("/channels", CreateChannel);
         }
 
         public async static Task<IResult> GetAllChannels(DataContext db)
@@ -21,7 +22,7 @@ namespace MessageBus.APIs
             List<Channel> channels = await db.Channels.ToListAsync();
             List<Channel> response = new JsonResponseBuilder(channels).Build<List<Channel>>();
 
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetAllChannels [200]: {JsonSerializer.Serialize(response)}");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetAllChannels [200]: {JsonFormatter.toString(response)}");
             return Results.Ok(response);
         }
 
@@ -45,8 +46,25 @@ namespace MessageBus.APIs
                 return Results.BadRequest(message);
             }
             Channel response = new JsonResponseBuilder(channel).Build<Channel>();
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetChannel {{ id: {id} }} [200]: {JsonSerializer.Serialize(response)}");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetChannel {{ id: {id} }} [200]: {JsonFormatter.toString(response)}");
             return Results.Ok(response);
+        }
+
+        public async static Task<IResult> CreateChannel(DataContext db, ChannelDto channelDto)
+        {
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Request CreateChannel {{ Channel: {JsonFormatter.toString(channelDto)} }}");
+
+            var channel = new Channel();
+            channel.Name = channelDto.Name;
+
+            db.Channels.Add(channel);
+            await db.SaveChangesAsync();
+            
+            var id = channel.Id;
+            var url = $"/channel/{id}";
+
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response CreateChannel {{ Channel: {JsonFormatter.toString(channel)} }} [201]");
+            return Results.Created(url, channel);
         }
     }
 }
