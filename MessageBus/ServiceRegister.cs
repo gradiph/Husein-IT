@@ -6,7 +6,7 @@ namespace MessageBus
     {
         public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
         {
-            // Add services to the container.
+            // Database service
             var dockerConnectionString = builder.Configuration.GetConnectionString("Docker");
             builder.Services.AddDbContext<DataContext>(options =>
             options.UseMySql(dockerConnectionString, ServerVersion.AutoDetect(dockerConnectionString))
