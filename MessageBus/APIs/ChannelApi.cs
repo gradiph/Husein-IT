@@ -13,6 +13,7 @@ namespace MessageBus.APIs
             app.MapGet("/channels", GetAllChannels);
             app.MapGet("/channel/{id}", GetChannel);
             app.MapPost("/channels", CreateChannel);
+            app.MapPut("/channel/{id}", UpdateChannel);
         }
 
         public async static Task<IResult> GetAllChannels(DataContext db)
@@ -42,12 +43,16 @@ namespace MessageBus.APIs
                     .Include(c => c.Messages)
                     .FirstAsync();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when finding Channels with id " + id, e);
+
                 var message = "No channel with id " + id;
                 LogWriter.Instance.LogAsync(db, LogType.Stream, 
-                    $"Response GetChannel {{ id: {id} }} [400]: {message}");
-                return Results.BadRequest(message);
+                    $"Response GetChannel {{ id: {id} }} " +
+                    $"[422]: " +
+                    $"{message}");
+                return Results.UnprocessableEntity(message);
             }
             Channel response = new JsonResponseBuilder(channel).Build<Channel>();
             LogWriter.Instance.LogAsync(db, LogType.Stream, 
@@ -57,14 +62,14 @@ namespace MessageBus.APIs
 
         public async static Task<IResult> CreateChannel(DataContext db, ChannelDto channelDto)
         {
-            LogWriter.Instance.LogAsync(db, LogType.Stream, 
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request CreateChannel {{ ChannelDto: {JsonFormatter.ToString(channelDto)} }}");
 
             var channel = channelDto.ToChannel();
 
             db.Channels.Add(channel);
             await db.SaveChangesAsync();
-            
+
             var url = $"/channel/{channel.Id}";
 
             LogWriter.Instance.LogAsync(db, LogType.Stream,
@@ -73,6 +78,38 @@ namespace MessageBus.APIs
                 $"{{ url: {url}, channel: {JsonFormatter.ToString(channel)} }}"
             );
             return Results.Created(url, channel);
+        }
+
+        public async static Task<IResult> UpdateChannel(DataContext db, int id, ChannelDto channelDto)
+        {
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Request UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }}");
+
+            Channel channel;
+            try
+            {
+                channel = await db.Channels.FindAsync(id);
+            }
+            catch (Exception e)
+            {
+                var message = "No channel with id " + id;
+                LogWriter.Instance.LogAsync(db, LogType.Stream,
+                    $"Response UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
+                    $"[422]: " +
+                    $"{message}");
+                return Results.UnprocessableEntity(message);
+            }
+
+            channel.Name = channelDto.Name;
+
+            await db.SaveChangesAsync();
+
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Response UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
+                $"[200]: " +
+                $"{{ channel: {channel} }}"
+            );
+            return Results.Ok(channel);
         }
     }
 }
