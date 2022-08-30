@@ -6,5 +6,12 @@ namespace MessageBus.Models.DTOs
     {
         [Required]
         public string Name { get; set; }
+
+        public Channel ToChannel()
+        {
+            Channel channel = new Channel();
+            channel.Name = Name;
+            return channel;
+        }
     }
 }
