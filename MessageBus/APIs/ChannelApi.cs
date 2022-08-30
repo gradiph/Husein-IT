@@ -1,7 +1,8 @@
-﻿using MessageBus.Models;
-using Microsoft.EntityFrameworkCore;
-using CommonJson;
+﻿using CommonJson;
 using CommonLog;
+using MessageBus.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace MessageBus.APIs
 {
@@ -15,13 +16,19 @@ namespace MessageBus.APIs
 
         public async static Task<IResult> GetAllChannels(DataContext db)
         {
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Request GetAllChannels");
+
             List<Channel> channels = await db.Channels.ToListAsync();
             List<Channel> response = new JsonResponseBuilder(channels).Build<List<Channel>>();
+
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetAllChannels [200]: {JsonSerializer.Serialize(response)}");
             return Results.Ok(response);
         }
 
         public async static Task<IResult> GetChannel(DataContext db, int id)
         {
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Request GetChannel {{ id: {id} }}");
+
             Channel channel;
             try
             {
@@ -33,9 +40,12 @@ namespace MessageBus.APIs
             }
             catch (Exception)
             {
-                return Results.BadRequest("No channel with id " + id);
+                var message = "No channel with id " + id;
+                LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetChannel {{ id: {id} }} [400]: {message}");
+                return Results.BadRequest(message);
             }
             Channel response = new JsonResponseBuilder(channel).Build<Channel>();
+            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetChannel {{ id: {id} }} [200]: {JsonSerializer.Serialize(response)}");
             return Results.Ok(response);
         }
     }
