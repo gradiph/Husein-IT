@@ -17,18 +17,21 @@ namespace MessageBus.APIs
 
         public async static Task<IResult> GetAllChannels(DataContext db)
         {
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Request GetAllChannels");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, 
+                $"Request GetAllChannels");
 
             List<Channel> channels = await db.Channels.ToListAsync();
             List<Channel> response = new JsonResponseBuilder(channels).Build<List<Channel>>();
 
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetAllChannels [200]: {JsonFormatter.toString(response)}");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, 
+                $"Response GetAllChannels [200]: {JsonFormatter.ToString(response)}");
             return Results.Ok(response);
         }
 
         public async static Task<IResult> GetChannel(DataContext db, int id)
         {
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Request GetChannel {{ id: {id} }}");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, 
+                $"Request GetChannel {{ id: {id} }}");
 
             Channel channel;
             try
@@ -42,28 +45,33 @@ namespace MessageBus.APIs
             catch (Exception)
             {
                 var message = "No channel with id " + id;
-                LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetChannel {{ id: {id} }} [400]: {message}");
+                LogWriter.Instance.LogAsync(db, LogType.Stream, 
+                    $"Response GetChannel {{ id: {id} }} [400]: {message}");
                 return Results.BadRequest(message);
             }
             Channel response = new JsonResponseBuilder(channel).Build<Channel>();
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response GetChannel {{ id: {id} }} [200]: {JsonFormatter.toString(response)}");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, 
+                $"Response GetChannel {{ id: {id} }} [200]: {JsonFormatter.ToString(response)}");
             return Results.Ok(response);
         }
 
         public async static Task<IResult> CreateChannel(DataContext db, ChannelDto channelDto)
         {
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Request CreateChannel {{ Channel: {JsonFormatter.toString(channelDto)} }}");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, 
+                $"Request CreateChannel {{ ChannelDto: {JsonFormatter.ToString(channelDto)} }}");
 
-            var channel = new Channel();
-            channel.Name = channelDto.Name;
+            var channel = channelDto.ToChannel();
 
             db.Channels.Add(channel);
             await db.SaveChangesAsync();
             
-            var id = channel.Id;
-            var url = $"/channel/{id}";
+            var url = $"/channel/{channel.Id}";
 
-            LogWriter.Instance.LogAsync(db, LogType.Stream, $"Response CreateChannel {{ Channel: {JsonFormatter.toString(channel)} }} [201]");
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Response CreateChannel {{ ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
+                $"[201]: " +
+                $"{{ url: {url}, channel: {JsonFormatter.ToString(channel)} }}"
+            );
             return Results.Created(url, channel);
         }
     }
