@@ -9,6 +9,7 @@ namespace MessageBus.Models
         public string Name { get; set; }
         public string Url { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? DeletedAt { get; set; } = null;
 
         public ICollection<Channel> Channels { get; set; }
         public ICollection<MessageSubscriber> Messages { get; set; }
