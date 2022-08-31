@@ -7,7 +7,7 @@ namespace MessageBus.Models
     {
         public int Id { get; set; }
         public string PublisherName { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public string Data { get; set; }
 
         [Required]
