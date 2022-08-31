@@ -34,19 +34,9 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream, 
                 $"Request GetChannel {{ id: {id} }}");
 
-            Channel channel;
-            try
+            Channel channel = await db.Channels.FindAsync(id);
+            if (channel == null)
             {
-                channel = await db.Channels
-                    .Where(c => c.Id == id)
-                    .Include(c => c.Subscribers)
-                    .Include(c => c.Messages)
-                    .FirstAsync();
-            }
-            catch (Exception e)
-            {
-                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when finding Channels with id " + id, e);
-
                 var message = "No channel with id " + id;
                 LogWriter.Instance.LogAsync(db, LogType.Stream, 
                     $"Response GetChannel {{ id: {id} }} " +
@@ -54,6 +44,9 @@ namespace MessageBus.APIs
                     $"{message}");
                 return Results.UnprocessableEntity(message);
             }
+            await db.Entry(channel).Collection(c => c.Subscribers).LoadAsync();
+            await db.Entry(channel).Collection(c => c.Messages).LoadAsync();
+
             Channel response = new JsonResponseBuilder(channel).Build<Channel>();
             LogWriter.Instance.LogAsync(db, LogType.Stream, 
                 $"Response GetChannel {{ id: {id} }} [200]: {JsonFormatter.ToString(response)}");
@@ -85,14 +78,10 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }}");
 
-            Channel channel;
-            try
+            Channel channel = await db.Channels.FindAsync(id);
+            if (channel == null)
             {
-                channel = await db.Channels.FindAsync(id);
-            }
-            catch (Exception e)
-            {
-                var message = "No channel with id " + id;
+                var message = "No Channel with id " + id;
                 LogWriter.Instance.LogAsync(db, LogType.Stream,
                     $"Response UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
                     $"[422]: " +
@@ -107,7 +96,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Response UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
                 $"[200]: " +
-                $"{{ channel: {channel} }}"
+                $"{{ channel: {JsonFormatter.ToString(channel)} }}"
             );
             return Results.Ok(channel);
         }
