@@ -14,6 +14,7 @@ namespace MessageBus.APIs
             app.MapGet("/channel/{id}", GetChannel);
             app.MapPost("/channels", CreateChannel);
             app.MapPut("/channel/{id}", UpdateChannel);
+            app.MapDelete("/channel/{id}", DeleteChannel);
         }
 
         public async static Task<IResult> GetAllChannels(DataContext db)
@@ -99,6 +100,32 @@ namespace MessageBus.APIs
                 $"{{ channel: {JsonFormatter.ToString(channel)} }}"
             );
             return Results.Ok(channel);
+        }
+
+        public async static Task<IResult> DeleteChannel(DataContext db, int id)
+        {
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Request DeleteChannel {{ id: {id} }}");
+
+            Channel channel = await db.Channels.FindAsync(id);
+            if (channel == null)
+            {
+                var message = "No Channel with id " + id;
+                LogWriter.Instance.LogAsync(db, LogType.Stream,
+                    $"Response DeleteChannel {{ id: {id} }} " +
+                    $"[422]: " +
+                    $"{message}");
+                return Results.UnprocessableEntity(message);
+            }
+
+            db.Channels.Remove(channel);
+            await db.SaveChangesAsync();
+
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Response DeleteChannel {{ id: {id} }} " +
+                $"[204]: "
+            );
+            return Results.NoContent();
         }
     }
 }
