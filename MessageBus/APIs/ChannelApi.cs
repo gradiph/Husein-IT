@@ -1,4 +1,5 @@
 ﻿using CommonJson;
+using CommonHttp;
 using CommonLog;
 using MessageBus.Models;
 using MessageBus.Models.DTOs;
@@ -14,118 +15,247 @@ namespace MessageBus.APIs
             app.MapGet("/channel/{id}", GetChannel);
             app.MapPost("/channels", CreateChannel);
             app.MapPut("/channel/{id}", UpdateChannel);
-            app.MapDelete("/channel/{id}", DeleteChannel);
+            app.MapDelete("/channel/{id}", SoftDeleteChannel);
+            app.MapPost("/channel/{id}/restore", RestoreChannel);
+            app.MapDelete("/channel/{id}/force", DestroyChannel);
         }
 
-        public async static Task<IResult> GetAllChannels(DataContext db)
+        public async static Task<IResult> GetAllChannels(HttpRequest request, DataContext db)
         {
-            LogWriter.Instance.LogAsync(db, LogType.Stream, 
-                $"Request GetAllChannels");
+            LogWriter.Instance.LogAsync(db, LogType.Stream, "Request GetAllChannels");
 
-            List<Channel> channels = await db.Channels.ToListAsync();
-            List<Channel> response = new JsonResponseBuilder(channels).Build<List<Channel>>();
+            var statusCode = 200;
+            var message = "success";
+            object response = null;
+            try
+            {
+                List<Channel> channels = await db.Channels
+                    .Where(c => c.DeletedAt == null)
+                    .ToListAsync();
+
+                response = new JsonResponseBuilder(channels).Build< List<Channel>>();
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when retrieving all channels.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
 
             LogWriter.Instance.LogAsync(db, LogType.Stream, 
-                $"Response GetAllChannels [200]: {JsonFormatter.ToString(response)}");
-            return Results.Ok(response);
+                $"Response GetAllChannels [{statusCode}]: {JsonFormatter.ToString(response)}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
 
-        public async static Task<IResult> GetChannel(DataContext db, int id)
+        public async static Task<IResult> GetChannel(HttpRequest request, DataContext db, int id)
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream, 
                 $"Request GetChannel {{ id: {id} }}");
 
-            Channel channel = await db.Channels.FindAsync(id);
-            if (channel == null)
+            var statusCode = 200;
+            var message = "success";
+            object response = null;
+            try
             {
-                var message = "No channel with id " + id;
-                LogWriter.Instance.LogAsync(db, LogType.Stream, 
-                    $"Response GetChannel {{ id: {id} }} " +
-                    $"[422]: " +
-                    $"{message}");
-                return Results.UnprocessableEntity(message);
-            }
-            await db.Entry(channel).Collection(c => c.Subscribers).LoadAsync();
-            await db.Entry(channel).Collection(c => c.Messages).LoadAsync();
+                Channel channel = await db.Channels
+                    .Where(c => c.DeletedAt == null && c.Id == id)
+                    .Include(c => c.Subscribers.Where(s => s.DeletedAt == null))
+                    .Include(c => c.Messages)
+                    .FirstAsync();
 
-            Channel response = new JsonResponseBuilder(channel).Build<Channel>();
+                response = new JsonResponseBuilder(channel).Build<Channel>();
+            } catch (InvalidOperationException e)
+            {
+                statusCode = 422;
+                message = "No channel with id " + id;
+            } catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when retrieving channel.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
+
             LogWriter.Instance.LogAsync(db, LogType.Stream, 
-                $"Response GetChannel {{ id: {id} }} [200]: {JsonFormatter.ToString(response)}");
-            return Results.Ok(response);
+                $"Response GetChannel {{ id: {id} }} [{statusCode}]: {JsonFormatter.ToString(response)}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
 
-        public async static Task<IResult> CreateChannel(DataContext db, ChannelDto channelDto)
+        public async static Task<IResult> CreateChannel(HttpRequest request, DataContext db, ChannelDto channelDto)
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request CreateChannel {{ ChannelDto: {JsonFormatter.ToString(channelDto)} }}");
 
-            var channel = channelDto.ToChannel();
+            var statusCode = 201;
+            var message = "success";
+            object response = null;
+            try
+            {
+                var channel = channelDto.ToChannel();
 
-            db.Channels.Add(channel);
-            await db.SaveChangesAsync();
+                db.Channels.Add(channel);
+                await db.SaveChangesAsync();
 
-            var url = $"/channel/{channel.Id}";
+                message = $"/channel/{channel.Id}";
+
+                response = new JsonResponseBuilder(channel).Build<Channel>();
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when creating channel.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
 
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Response CreateChannel {{ ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
-                $"[201]: " +
-                $"{{ url: {url}, channel: {JsonFormatter.ToString(channel)} }}"
+                $"[{statusCode}]: {JsonFormatter.ToString(response)}"
             );
-            return Results.Created(url, channel);
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
 
-        public async static Task<IResult> UpdateChannel(DataContext db, int id, ChannelDto channelDto)
+        public async static Task<IResult> UpdateChannel(HttpRequest request, DataContext db, int id, ChannelDto channelDto)
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }}");
 
-            Channel channel = await db.Channels.FindAsync(id);
-            if (channel == null)
+            var statusCode = 200;
+            var message = "success";
+            object response = null;
+            try
             {
-                var message = "No Channel with id " + id;
-                LogWriter.Instance.LogAsync(db, LogType.Stream,
-                    $"Response UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
-                    $"[422]: " +
-                    $"{message}");
-                return Results.UnprocessableEntity(message);
+                Channel channel = await db.Channels
+                    .Where(c => c.DeletedAt == null && c.Id == id)
+                    .FirstAsync();
+                
+                channel.Name = channelDto.Name;
+
+                await db.SaveChangesAsync();
+
+                response = new JsonResponseBuilder(channel).Build<Channel>();
             }
-
-            channel.Name = channelDto.Name;
-
-            await db.SaveChangesAsync();
+            catch (InvalidOperationException e)
+            {
+                statusCode = 422;
+                message = "No channel with id " + id;
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when updating channel.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
 
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Response UpdateChannel {{ id: {id}, ChannelDto: {JsonFormatter.ToString(channelDto)} }} " +
-                $"[200]: " +
-                $"{{ channel: {JsonFormatter.ToString(channel)} }}"
-            );
-            return Results.Ok(channel);
+                $"[{statusCode}]: {JsonFormatter.ToString(response)}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
 
-        public async static Task<IResult> DeleteChannel(DataContext db, int id)
+        public async static Task<IResult> SoftDeleteChannel(HttpRequest request, DataContext db, int id)
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream,
-                $"Request DeleteChannel {{ id: {id} }}");
+                $"Request SoftDeleteChannel {{ id: {id} }}");
 
-            Channel channel = await db.Channels.FindAsync(id);
-            if (channel == null)
+            var statusCode = 204;
+            var message = "success";
+            object response = null;
+            try
             {
-                var message = "No Channel with id " + id;
-                LogWriter.Instance.LogAsync(db, LogType.Stream,
-                    $"Response DeleteChannel {{ id: {id} }} " +
-                    $"[422]: " +
-                    $"{message}");
-                return Results.UnprocessableEntity(message);
+                Channel channel = await db.Channels
+                    .Where(c => c.DeletedAt == null && c.Id == id)
+                    .FirstAsync();
+
+                channel.DeletedAt = DateTime.UtcNow;
+                await db.SaveChangesAsync();
+            }
+            catch (InvalidOperationException e)
+            {
+                statusCode = 422;
+                message = "No channel with id " + id;
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when soft deleting channel.", e);
+                statusCode = 500;
+                message = e.Message;
             }
 
-            db.Channels.Remove(channel);
-            await db.SaveChangesAsync();
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Response SoftDeleteChannel {{ id: {id} }} " +
+                $"[{statusCode}]: {JsonFormatter.ToString(response)}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
+        }
+
+        public async static Task<IResult> RestoreChannel(HttpRequest request, DataContext db, int id)
+        {
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Request RestoreChannel {{ id: {id} }}");
+
+            var statusCode = 200;
+            var message = "success";
+            object response = null;
+            try
+            {
+                Channel channel = await db.Channels
+                    .Where(c => c.DeletedAt != null && c.Id == id)
+                    .FirstAsync();
+
+                channel.DeletedAt = null;
+                await db.SaveChangesAsync();
+
+                response = new JsonResponseBuilder(channel).Build<Channel>();
+            }
+            catch (InvalidOperationException e)
+            {
+                statusCode = 422;
+                message = "No channel with id " + id;
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when restoring channel.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
 
             LogWriter.Instance.LogAsync(db, LogType.Stream,
-                $"Response DeleteChannel {{ id: {id} }} " +
-                $"[204]: "
-            );
-            return Results.NoContent();
+                $"Response RestoreChannel {{ id: {id} }} " +
+                $"[{statusCode}]: {JsonFormatter.ToString(response)}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
+        }
+
+        public async static Task<IResult> DestroyChannel(HttpRequest request, DataContext db, int id)
+        {
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Request DestroyChannel {{ id: {id} }}");
+
+            var statusCode = 204;
+            var message = "success";
+            object response = null;
+            try
+            {
+                Channel channel = await db.Channels
+                    .Where(c => c.DeletedAt != null && c.Id == id)
+                    .FirstAsync();
+
+                db.Channels.Remove(channel);
+                await db.SaveChangesAsync();
+            }
+            catch (InvalidOperationException e)
+            {
+                statusCode = 422;
+                message = "No channel with id " + id;
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when soft deleting channel.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
+
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Response DestroyChannel {{ id: {id} }} " +
+                $"[{statusCode}]: {JsonFormatter.ToString(response)}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
     }
 }
