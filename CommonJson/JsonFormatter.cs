@@ -2,7 +2,7 @@
 
 namespace CommonJson
 {
-    public class JsonFormatter
+    public static class JsonFormatter
     {
         public static string ToString(object @object)
         {
@@ -12,6 +12,11 @@ namespace CommonJson
         public static T ParseString<T>(string @string)
         {
             return JsonSerializer.Deserialize<T>(@string);
+        }
+
+        public static T ParseStream<T>(Stream stream)
+        {
+            return JsonSerializer.Deserialize<T>(stream);
         }
     }
 }
