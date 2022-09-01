@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BackOfficeWeb.Controllers
+namespace BackOfficeWeb.Areas.MessageBus.Controllers
 {
+    [Area("MessageBus")]
     public class ChannelController : Controller
     {
         public IActionResult Index()
