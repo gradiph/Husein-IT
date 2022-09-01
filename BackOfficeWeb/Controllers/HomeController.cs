@@ -1,8 +1,8 @@
-﻿using Husein_IT_Web.Models;
+﻿using BackOfficeWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
-namespace Husein_IT_Web.Controllers
+namespace BackOfficeWeb.Controllers
 {
     public class HomeController : Controller
     {

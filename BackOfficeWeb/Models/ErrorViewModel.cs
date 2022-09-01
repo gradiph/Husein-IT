@@ -1,4 +1,4 @@
-namespace Husein_IT_Web.Models
+namespace BackOfficeWeb.Models
 {
     public class ErrorViewModel
     {

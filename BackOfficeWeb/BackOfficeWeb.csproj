@@ -4,8 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>Husein_IT_Web</RootNamespace>
-    <UserSecretsId>1c852493-70c8-47c8-a61a-2f726c30fb25</UserSecretsId>
+    <UserSecretsId>7953d58e-1a8e-4c3a-97d2-3a7030f5c6c6</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 

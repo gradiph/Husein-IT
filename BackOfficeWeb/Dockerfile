@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Husein IT Web/Husein IT Web.csproj", "Husein IT Web/"]
-RUN dotnet restore "Husein IT Web/Husein IT Web.csproj"
+COPY ["BackOfficeWeb/BackOfficeWeb.csproj", "BackOfficeWeb/"]
+RUN dotnet restore "BackOfficeWeb/BackOfficeWeb.csproj"
 COPY . .
-WORKDIR "/src/Husein IT Web"
-RUN dotnet build "Husein IT Web.csproj" -c Release -o /app/build
+WORKDIR "/src/BackOfficeWeb"
+RUN dotnet build "BackOfficeWeb.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "Husein IT Web.csproj" -c Release -o /app/publish
+RUN dotnet publish "BackOfficeWeb.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Husein IT Web.dll"]
+ENTRYPOINT ["dotnet", "BackOfficeWeb.dll"]
