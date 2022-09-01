@@ -9,7 +9,7 @@ namespace CommonJson
             return JsonSerializer.Serialize(@object);
         }
 
-        public static T ToObject<T>(string @string)
+        public static T ParseString<T>(string @string)
         {
             return JsonSerializer.Deserialize<T>(@string);
         }
