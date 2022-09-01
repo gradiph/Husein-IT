@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Channels Management";
+}
+
+<div class="text-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+</div> <!-- .text-center -->
+
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <td>#</td>
+                <td>Name</td>
+                <td>Action</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>First Channel</td>
+                <td>
+                    <a asp-action="Show" asp-route-id="1" class="btn btn-info">Show</a>
+                    <a asp-action="Edit" asp-route-id="1" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="1" class="btn btn-info">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div> <!-- .container -->
