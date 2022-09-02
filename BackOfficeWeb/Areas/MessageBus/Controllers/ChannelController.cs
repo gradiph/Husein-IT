@@ -1,13 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BackOfficeWeb.Interfaces;
+using BackOfficeWeb.Models.MessageBus;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BackOfficeWeb.Areas.MessageBus.Controllers
 {
     [Area("MessageBus")]
     public class ChannelController : Controller
     {
-        public IActionResult Index()
+        private readonly IMessageBusService _messageBusService;
+
+        public ChannelController(IMessageBusService messageBusService)
         {
-            return View();
+            _messageBusService = messageBusService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            ChannelViewModel channelViewModel = new ChannelViewModel();
+            channelViewModel.Channels = await _messageBusService.GetAllChannelsAsync();
+            return View(channelViewModel);
         }
 
         public IActionResult Show()

@@ -1,4 +1,6 @@
-﻿@{
+﻿@using BackOfficeWeb.Models.MessageBus
+@model ChannelViewModel
+@{
     ViewData["Title"] = "Channels Management";
 }
 
@@ -17,15 +19,18 @@
         </thead>
 
         <tbody>
-            <tr>
-                <td>1</td>
-                <td>First Channel</td>
-                <td>
-                    <a asp-action="Show" asp-route-id="1" class="btn btn-info">Show</a>
-                    <a asp-action="Edit" asp-route-id="1" class="btn btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="1" class="btn btn-info">Delete</a>
-                </td>
-            </tr>
+            @foreach (var obj in Model.Channels)
+            {
+                <tr>
+                    <td>1</td>
+                    <td>First Channel</td>
+                    <td>
+                        <a asp-action="Show" asp-route-id="1" class="btn btn-info">Show</a>
+                        <a asp-action="Edit" asp-route-id="1" class="btn btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="1" class="btn btn-info">Delete</a>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 </div> <!-- .container -->

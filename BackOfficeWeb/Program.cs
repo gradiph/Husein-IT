@@ -1,7 +1,16 @@
+using BackOfficeWeb.Interfaces;
+using BackOfficeWeb.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient("MessageBus", httpClient =>
+{
+    var messageBusUrl = builder.Configuration.GetSection("Url")["MessageBus"];
+    httpClient.BaseAddress = new Uri(messageBusUrl);
+});
+builder.Services.AddScoped<IMessageBusService, MessageBusService>();
 
 var app = builder.Build();
 
@@ -19,6 +28,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
 app.MapControllerRoute(
     name: "MyArea",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
