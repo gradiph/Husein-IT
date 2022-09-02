@@ -2,7 +2,8 @@
 {
     public class PostPublish
     {
-        public string Name { get; set; }
+        public string PublisherName { get; set; }
         public int ChannelId { get; set; }
+        public string Data { get; set; }
     }
 }

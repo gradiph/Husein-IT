@@ -61,7 +61,7 @@ namespace MessageBus.APIs
 
                 response = new JsonResponseBuilder(subscriber).Build<Subscriber>();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No subscriber with id " + id;
@@ -131,7 +131,7 @@ namespace MessageBus.APIs
 
                 response = new JsonResponseBuilder(subscriber).Build<Subscriber>();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No subscriber with id " + id;
@@ -166,7 +166,7 @@ namespace MessageBus.APIs
                 subscriber.DeletedAt = DateTime.UtcNow;
                 await db.SaveChangesAsync();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No subscriber with id " + id;
@@ -203,7 +203,7 @@ namespace MessageBus.APIs
 
                 response = new JsonResponseBuilder(subscriber).Build<Subscriber>();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No subscriber with id " + id;
@@ -238,7 +238,7 @@ namespace MessageBus.APIs
                 db.Subscribers.Remove(subscriber);
                 await db.SaveChangesAsync();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No subscriber with id " + id;

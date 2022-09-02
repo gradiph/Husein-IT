@@ -1,5 +1,4 @@
 ﻿using CommonMessage.FormRequest;
-using MessageBus.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace MessageBus.APIs
@@ -8,34 +7,56 @@ namespace MessageBus.APIs
     {
         public static void RegisterPublishApi(this WebApplication app)
         {
-            app.MapPost("/publish", async (DataContext db, PostPublish request) =>
+            app.MapPost("/publish", PublishMessage);
+        }
+
+        public async static Task<IResult> PublishMessage(HttpRequest request, DataContext db, PostPublish data)
+        {
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Request PublishMessage {{ PostPublish: {JsonFormatter.ToString(data)} }}");
+
+            var statusCode = 200;
+            var message = "success";
+            object response = null;
+            try
             {
-                var channel = await db.Channels
-                    .FindAsync(request.ChannelId);
-                if (channel == null)
-                {
-                    return Results.BadRequest("channel is not found");
-                }
+                Channel channel = await db.Channels
+                    .Where(c => c.DeletedAt == null && c.Id == data.ChannelId)
+                    .Include(c => c.Subscribers.Where(s => s.DeletedAt == null))
+                    .FirstAsync();
 
-                var message = new Message();
-                message.PublisherName = request.Name;
-                message.Channel = channel;
+                var messageObj = new Message();
+                messageObj.PublisherName = data.PublisherName;
+                messageObj.Channel = channel;
+                messageObj.Data = data.Data;
 
-                db.Messages.Add(message);
+                await db.Messages.AddAsync(messageObj);
 
-                var subscribers = await db.Subscribers.Where(s => s.Channels == channel).ToListAsync();
-
-                foreach (var subscriber in subscribers)
+                foreach (var subscriber in channel.Subscribers)
                 {
                     var messageSubscriber = new MessageSubscriber();
                     messageSubscriber.Subscriber = subscriber;
-                    messageSubscriber.Message = message;
-                    db.MessageSubscribers.Add(messageSubscriber);
+                    messageSubscriber.Message = messageObj;
+                    await db.MessageSubscribers.AddAsync(messageSubscriber);
                 }
-                await db.SaveChangesAsync();
 
-                return Results.Ok();
-            });
+                await db.SaveChangesAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                statusCode = 422;
+                message = "No channel with id " + data.ChannelId;
+            }
+            catch (Exception e)
+            {
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when publishing message.", e);
+                statusCode = 500;
+                message = e.Message;
+            }
+
+            LogWriter.Instance.LogAsync(db, LogType.Stream,
+                $"Response PublishMessage {{ PostPublish: {JsonFormatter.ToString(data)} }}");
+            return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
     }
 }

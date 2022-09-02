@@ -61,7 +61,7 @@ namespace MessageBus.APIs
                     .FirstAsync();
 
                 response = new JsonResponseBuilder(channel).Build<Channel>();
-            } catch (InvalidOperationException e)
+            } catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No channel with id " + id;
@@ -130,7 +130,7 @@ namespace MessageBus.APIs
 
                 response = new JsonResponseBuilder(channel).Build<Channel>();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No channel with id " + id;
@@ -165,7 +165,7 @@ namespace MessageBus.APIs
                 channel.DeletedAt = DateTime.UtcNow;
                 await db.SaveChangesAsync();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No channel with id " + id;
@@ -202,7 +202,7 @@ namespace MessageBus.APIs
 
                 response = new JsonResponseBuilder(channel).Build<Channel>();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No channel with id " + id;
@@ -237,7 +237,7 @@ namespace MessageBus.APIs
                 db.Channels.Remove(channel);
                 await db.SaveChangesAsync();
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
                 statusCode = 422;
                 message = "No channel with id " + id;
