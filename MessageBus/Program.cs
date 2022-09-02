@@ -1,7 +1,11 @@
-using CommonLog;
-using MessageBus;
+global using CommonJson;
+global using CommonHttp;
+global using CommonLog;
+global using MessageBus.Models;
 using MessageBus.APIs;
-using MessageBus.Models;
+using MessageBus;
+
+LogWriter.Instance.LogAsync(new Channel(), LogType.Trace, "System is starting...");
 
 var app = WebApplication.CreateBuilder(args)
     .RegisterServices()
@@ -12,12 +16,5 @@ app.RegisterSubscriberApi();
 app.RegisterChannelApi();
 app.RegisterPublishApi();
 
-app.MapGet("/test", (DataContext db) =>
-{
-    LogWriter.Instance.LogAsync(new Channel(), LogType.Temp, "Test logging");
-
-    var type = new Channel().GetType().Namespace;
-    return type;
-});
-
+LogWriter.Instance.LogAsync(new Channel(), LogType.Trace, "System is ready.");
 app.Run();

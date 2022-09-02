@@ -1,7 +1,4 @@
-﻿using CommonJson;
-using CommonHttp;
-using CommonLog;
-using MessageBus.Models;
+﻿using MessageBus.Models;
 using MessageBus.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,12 +9,12 @@ namespace MessageBus.APIs
         public static void RegisterChannelApi(this WebApplication app)
         {
             app.MapGet("/channels", GetAllChannels);
-            app.MapGet("/channel/{id}", GetChannel);
+            app.MapGet("/channels/{id}", GetChannel);
             app.MapPost("/channels", CreateChannel);
-            app.MapPut("/channel/{id}", UpdateChannel);
-            app.MapDelete("/channel/{id}", SoftDeleteChannel);
-            app.MapPost("/channel/{id}/restore", RestoreChannel);
-            app.MapDelete("/channel/{id}/force", DestroyChannel);
+            app.MapPut("/channels/{id}", UpdateChannel);
+            app.MapDelete("/channels/{id}", SoftDeleteChannel);
+            app.MapPost("/channels/{id}/restore", RestoreChannel);
+            app.MapDelete("/channels/{id}/force", DestroyChannel);
         }
 
         public async static Task<IResult> GetAllChannels(HttpRequest request, DataContext db)
@@ -247,7 +244,7 @@ namespace MessageBus.APIs
             }
             catch (Exception e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when soft deleting channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Error, "Error when destroying channel.", e);
                 statusCode = 500;
                 message = e.Message;
             }
