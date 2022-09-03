@@ -33,7 +33,7 @@ namespace CommonHttp
             }
             else if (_statusCode == 422)
             {
-                return Results.UnprocessableEntity(_message);
+                return Results.Problem(_message, _httpRequest.Path, _statusCode, "Unprocessable Request");
             }
             else
             {
