@@ -11,7 +11,7 @@ namespace MessageBus.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? DeletedAt { get; set; } = null;
 
-        public ICollection<Channel> Channels { get; set; }
-        public ICollection<MessageSubscriber> Messages { get; set; }
+        public ICollection<Channel> Channels { get; set; } = new List<Channel>();
+        public ICollection<MessageSubscriber> Messages { get; set; } = new List<MessageSubscriber>();
     }
 }

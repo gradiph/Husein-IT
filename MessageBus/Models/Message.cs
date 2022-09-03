@@ -12,6 +12,6 @@ namespace MessageBus.Models
 
         [Required]
         public Channel Channel { get; set; }
-        public ICollection<MessageSubscriber> Subscribers { get; set; }
+        public ICollection<MessageSubscriber> Subscribers { get; set; } = new List<MessageSubscriber>();
     }
 }
