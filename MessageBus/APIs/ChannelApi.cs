@@ -11,42 +11,50 @@ namespace MessageBus.APIs
         {
             app.MapGet("/channels", GetAllChannels)
                 .Produces<ICollection<Channel>>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapGet("/channels/{id}", GetChannel)
                 .Produces<Channel>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapPost("/channels", CreateChannel)
                 .Produces<Channel>(StatusCodes.Status201Created)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapPut("/channels/{id}", UpdateChannel)
                 .Produces<Channel>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapDelete("/channels/{id}", SoftDeleteChannel)
                 .Produces(StatusCodes.Status204NoContent)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapPost("/channels/{id}/restore", RestoreChannel)
                 .Produces<Channel>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapDelete("/channels/{id}/force", DestroyChannel)
                 .Produces(StatusCodes.Status204NoContent)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapPost("/channels/{id}/subscribers", AddSubscribers)
                 .Produces<Channel>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
+
             app.MapDelete("/channels/{id}/subscribers", RemoveSubscribers)
                 .Produces<Channel>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status422UnprocessableEntity)
-                .Produces(StatusCodes.Status500InternalServerError);
+                .ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+                .ProducesProblem(StatusCodes.Status500InternalServerError);
         }
 
-        public async static Task<IResult> GetAllChannels(HttpRequest request, DataContext db)
+        public async static Task<IResult> GetAllChannels(HttpRequest request, [FromServices]DataContext db)
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream, "Request GetAllChannels");
 
