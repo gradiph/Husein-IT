@@ -1,6 +1,6 @@
-﻿namespace CommonMessage.FormRequest
+﻿namespace CommonMessage
 {
-    public class PostPublish
+    public class PublishDto
     {
         public string PublisherName { get; set; }
         public int ChannelId { get; set; }
