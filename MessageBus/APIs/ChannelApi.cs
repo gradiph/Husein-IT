@@ -91,18 +91,26 @@ namespace MessageBus.APIs
             object response = null;
             try
             {
-                Channel channel = await db.Channels
-                    .Where(c => c.DeletedAt == null && c.Id == id)
-                    .Include(c => c.Subscribers.Where(s => s.DeletedAt == null))
-                    .Include(c => c.Messages)
-                    .FirstAsync();
+                Channel channel;
+                try
+                {
+                    channel = await db.Channels
+                        .Where(c => c.DeletedAt != null && c.Id == id)
+                        .Include(c => c.Subscribers.Where(s => s.DeletedAt == null))
+                        .Include(c => c.Messages)
+                        .FirstAsync();
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new InvalidOperationException("No channel with id " + id);
+                }
 
                 response = new JsonResponseBuilder(channel).Build<Channel>();
             } catch (InvalidOperationException e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when removing subscribers from channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when retrieving channel.", e);
                 statusCode = StatusCodes.Status422UnprocessableEntity;
-                message = "No channel with id " + id;
+                message = e.Message;
             } catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when retrieving channel.", e);
@@ -158,10 +166,18 @@ namespace MessageBus.APIs
             object response = null;
             try
             {
-                Channel channel = await db.Channels
-                    .Where(c => c.DeletedAt == null && c.Id == id)
-                    .FirstAsync();
-                
+                Channel channel;
+                try
+                {
+                    channel = await db.Channels
+                        .Where(c => c.DeletedAt != null && c.Id == id)
+                        .FirstAsync();
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new InvalidOperationException("No channel with id " + id);
+                }
+
                 channel.Name = channelDto.Name;
 
                 await db.SaveChangesAsync();
@@ -170,9 +186,9 @@ namespace MessageBus.APIs
             }
             catch (InvalidOperationException e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when removing subscribers from channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when updating channel.", e);
                 statusCode = StatusCodes.Status422UnprocessableEntity;
-                message = "No channel with id " + id;
+                message = e.Message;
             }
             catch (Exception e)
             {
@@ -197,18 +213,26 @@ namespace MessageBus.APIs
             object response = null;
             try
             {
-                Channel channel = await db.Channels
-                    .Where(c => c.DeletedAt == null && c.Id == id)
-                    .FirstAsync();
+                Channel channel;
+                try
+                {
+                    channel = await db.Channels
+                        .Where(c => c.DeletedAt != null && c.Id == id)
+                        .FirstAsync();
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new InvalidOperationException("No channel with id " + id);
+                }
 
                 channel.DeletedAt = DateTime.UtcNow;
                 await db.SaveChangesAsync();
             }
             catch (InvalidOperationException e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when removing subscribers from channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when soft deleting channel.", e);
                 statusCode = StatusCodes.Status422UnprocessableEntity;
-                message = "No channel with id " + id;
+                message = e.Message;
             }
             catch (Exception e)
             {
@@ -233,9 +257,17 @@ namespace MessageBus.APIs
             object response = null;
             try
             {
-                Channel channel = await db.Channels
-                    .Where(c => c.DeletedAt != null && c.Id == id)
-                    .FirstAsync();
+                Channel channel;
+                try
+                {
+                    channel = await db.Channels
+                        .Where(c => c.DeletedAt != null && c.Id == id)
+                        .FirstAsync();
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new InvalidOperationException("No channel with id " + id);
+                }
 
                 channel.DeletedAt = null;
                 await db.SaveChangesAsync();
@@ -244,9 +276,9 @@ namespace MessageBus.APIs
             }
             catch (InvalidOperationException e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when removing subscribers from channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when restoring channel.", e);
                 statusCode = StatusCodes.Status422UnprocessableEntity;
-                message = "No channel with id " + id;
+                message = e.Message;
             }
             catch (Exception e)
             {
@@ -271,18 +303,26 @@ namespace MessageBus.APIs
             object response = null;
             try
             {
-                Channel channel = await db.Channels
-                    .Where(c => c.DeletedAt != null && c.Id == id)
-                    .FirstAsync();
+                Channel channel;
+                try
+                {
+                    channel = await db.Channels
+                        .Where(c => c.DeletedAt != null && c.Id == id)
+                        .FirstAsync();
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new InvalidOperationException("No channel with id " + id);
+                }
 
                 db.Channels.Remove(channel);
                 await db.SaveChangesAsync();
             }
             catch (InvalidOperationException e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when removing subscribers from channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when destroying channel.", e);
                 statusCode = StatusCodes.Status422UnprocessableEntity;
-                message = "No channel with id " + id;
+                message = e.Message;
             }
             catch (Exception e)
             {
@@ -340,7 +380,7 @@ namespace MessageBus.APIs
             }
             catch (InvalidOperationException e)
             {
-                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when removing subscribers from channel.", e);
+                LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when adding subscribers to channel.", e);
                 statusCode = StatusCodes.Status422UnprocessableEntity;
                 message = e.Message;
             }
