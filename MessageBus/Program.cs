@@ -14,7 +14,7 @@ var app = WebApplication.CreateBuilder(args)
 app.RegisterMiddleware();
 app.RegisterSubscriberApi();
 app.RegisterChannelApi();
-app.RegisterPublishApi();
+app.RegisterMessageApi();
 
 LogWriter.Instance.LogAsync(new Channel(), LogType.Trace, "System is ready.");
 app.Run();
