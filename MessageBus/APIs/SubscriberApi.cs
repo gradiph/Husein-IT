@@ -57,7 +57,7 @@ namespace MessageBus.APIs
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream, "Request GetAllSubscriber");
 
-            var statusCode = 200;
+            var statusCode = StatusCodes.Status200OK;
             var message = "success";
             object response = null;
             try
@@ -71,7 +71,7 @@ namespace MessageBus.APIs
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when retrieving all subscribers.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
@@ -85,7 +85,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request GetSubscriber {{ id: {id} }}");
 
-            var statusCode = 200;
+            var statusCode = StatusCodes.Status200OK;
             var message = "success";
             object response = null;
             try
@@ -106,16 +106,16 @@ namespace MessageBus.APIs
 
                 response = new JsonResponseBuilder(subscriber).Build<Subscriber>();
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when retrieving subscriber.", e);
-                statusCode = 422;
+                statusCode = StatusCodes.Status422UnprocessableEntity;
                 message = e.Message;
             }
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when retrieving subscriber.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
@@ -129,7 +129,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request CreateSubscriber {{ SubscriberDto: {JsonFormatter.ToString(subscriberDto)} }}");
 
-            var statusCode = 201;
+            var statusCode = StatusCodes.Status201Created;
             var message = "success";
             object response = null;
             try
@@ -140,13 +140,12 @@ namespace MessageBus.APIs
                 await db.SaveChangesAsync();
 
                 message = $"/subscriber/{subscriber.Id}";
-
                 response = new JsonResponseBuilder(subscriber).Build<Subscriber>();
             }
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when creating subscriber.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
@@ -162,7 +161,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request UpdateChannel {{ id: {id}, SubscriberDto: {JsonFormatter.ToString(subscriberDto)} }}");
 
-            var statusCode = 200;
+            var statusCode = StatusCodes.Status200OK;
             var message = "success";
             object response = null;
             try
@@ -188,13 +187,13 @@ namespace MessageBus.APIs
             catch (InvalidOperationException e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when updating subscriber.", e);
-                statusCode = 422;
+                statusCode = StatusCodes.Status422UnprocessableEntity;
                 message = e.Message;
             }
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when updating subscriber.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
@@ -209,7 +208,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request SoftDeleteSubscriber {{ id: {id} }}");
 
-            var statusCode = 204;
+            var statusCode = StatusCodes.Status204NoContent;
             var message = "success";
             object response = null;
             try
@@ -232,13 +231,13 @@ namespace MessageBus.APIs
             catch (InvalidOperationException e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when soft deleting subscriber.", e);
-                statusCode = 422;
+                statusCode = StatusCodes.Status422UnprocessableEntity;
                 message = e.Message;
             }
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when soft deleting subscriber.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
@@ -253,7 +252,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request RestoreSubscriber {{ id: {id} }}");
 
-            var statusCode = 200;
+            var statusCode = StatusCodes.Status200OK;
             var message = "success";
             object response = null;
             try
@@ -278,13 +277,13 @@ namespace MessageBus.APIs
             catch (InvalidOperationException e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when restoring subscriber.", e);
-                statusCode = 422;
+                statusCode = StatusCodes.Status422UnprocessableEntity;
                 message = e.Message;
             }
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when restoring subscriber.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
@@ -299,7 +298,7 @@ namespace MessageBus.APIs
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request DestroySubscriber {{ id: {id} }}");
 
-            var statusCode = 204;
+            var statusCode = StatusCodes.Status204NoContent;
             var message = "success";
             object response = null;
             try
@@ -321,13 +320,13 @@ namespace MessageBus.APIs
             catch (InvalidOperationException e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Trace, "Unprocessable when destroying subscriber.", e);
-                statusCode = 422;
+                statusCode = StatusCodes.Status422UnprocessableEntity;
                 message = e.Message;
             }
             catch (Exception e)
             {
                 LogWriter.Instance.LogAsync(db, LogType.Error, "Error when destroying subscriber.", e);
-                statusCode = 500;
+                statusCode = StatusCodes.Status500InternalServerError;
                 message = e.Message;
             }
 
