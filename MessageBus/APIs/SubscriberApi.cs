@@ -1,4 +1,5 @@
-﻿using MessageBus.Models.DTOs;
+﻿using MessageBus.Models;
+using MessageBus.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

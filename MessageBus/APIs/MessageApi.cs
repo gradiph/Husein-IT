@@ -1,4 +1,5 @@
 ﻿using CommonMessage;
+using MessageBus.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,7 @@
 global using CommonJson;
 global using CommonHttp;
 global using CommonLog;
-global using MessageBus.Models;
+using MessageBus.Models;
 using MessageBus.APIs;
 using MessageBus;
 
