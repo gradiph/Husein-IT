@@ -14,19 +14,8 @@ namespace CommonJson
 
         public T Build<T>()
         {
-            var option = GetDefaultOption();
-            string json = JsonSerializer.Serialize(_object, option);
-            return JsonSerializer.Deserialize<T>(json); ;
-        }
-
-        private JsonSerializerOptions GetDefaultOption()
-        {
-            var option = new JsonSerializerOptions
-            {
-                ReferenceHandler = ReferenceHandler.IgnoreCycles,
-                WriteIndented = true
-            };
-            return option;
+            string json = JsonFormatter.ToString(_object);
+            return JsonFormatter.ParseString<T>(json);
         }
     }
 }
