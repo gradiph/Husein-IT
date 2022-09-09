@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace MessageBus.Models
 {
@@ -13,5 +12,10 @@ namespace MessageBus.Models
         public Message Message { get; set; }
         public Subscriber Subscriber { get; set; }
         public DateTime? SentAt { get; set; }
+
+        public override string ToString()
+        {
+            return $"MessageSubscriber {{ {JsonFormatter.ToString(this)} }}";
+        }
     }
 }

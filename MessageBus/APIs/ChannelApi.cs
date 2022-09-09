@@ -67,7 +67,7 @@ namespace MessageBus.APIs
                     .Where(c => c.DeletedAt == null)
                     .ToListAsync();
 
-                response = new JsonResponseBuilder(channels).Build< List<Channel>>();
+                response = new JsonResponseBuilder(channels).Build<List<Channel>>();
             }
             catch (Exception e)
             {

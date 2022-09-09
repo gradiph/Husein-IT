@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MessageBus.Interfaces;
+using MessageBus.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 namespace MessageBus
@@ -7,13 +9,16 @@ namespace MessageBus
     {
         public static WebApplicationBuilder RegisterServices(this WebApplicationBuilder builder)
         {
-            // Database service
+            // Database services
             var dockerConnectionString = builder.Configuration.GetConnectionString("Docker");
             builder.Services.AddDbContext<DataContext>(options =>
             options.UseMySql(dockerConnectionString, ServerVersion.AutoDetect(dockerConnectionString))
             );
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            // HTTP services
+            builder.Services.AddHttpClient();
+
+            // API services
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
@@ -35,6 +40,18 @@ namespace MessageBus
                     }
                 });
             });
+
+            // Background services
+            builder.Services.AddSingleton<IBackgroundMessageQueue>(_ =>
+            {
+                if (!int.TryParse(builder.Configuration["QueueCapacity"], out var queueCapacity))
+                {
+                    queueCapacity = 100;
+                }
+                return new MessageQueueService(queueCapacity);
+            });
+            builder.Services.AddHostedService<MessageSenderService>();
+            builder.Services.AddHostedService<MessageResendService>();
 
             return builder;
         }

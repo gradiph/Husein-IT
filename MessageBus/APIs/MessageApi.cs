@@ -1,4 +1,5 @@
 ﻿using CommonMessage;
+using MessageBus.Interfaces;
 using MessageBus.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -100,7 +101,8 @@ namespace MessageBus.APIs
             return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
 
-        public async static Task<IResult> Publish(HttpRequest request, [FromServices]DataContext db, PublishDto data)
+        public async static Task<IResult> Publish(HttpRequest request, [FromServices]DataContext db, 
+            [FromServices]IBackgroundMessageQueue queue, PublishDto data)
         {
             LogWriter.Instance.LogAsync(db, LogType.Stream,
                 $"Request Publish {{ PublishDto: {JsonFormatter.ToString(data)} }}");
@@ -130,18 +132,25 @@ namespace MessageBus.APIs
 
                 await db.Messages.AddAsync(messageObj);
 
+                var messageSubscribers = new List<MessageSubscriber>();
                 foreach (var subscriber in channel.Subscribers)
                 {
                     var messageSubscriber = new MessageSubscriber();
                     messageSubscriber.Subscriber = subscriber;
                     messageSubscriber.Message = messageObj;
                     await db.MessageSubscribers.AddAsync(messageSubscriber);
+                    messageSubscribers.Add(messageSubscriber);
                 }
 
                 await db.SaveChangesAsync();
 
                 message = $"/messages/{messageObj.Id}";
                 response = new JsonResponseBuilder(messageObj).Build<Message>();
+
+                foreach (var messageSubscriber in messageSubscribers)
+                {
+                    queue.EnqueueAsync(messageSubscriber);
+                }
             }
             catch (InvalidOperationException e)
             {
@@ -157,7 +166,8 @@ namespace MessageBus.APIs
             }
 
             LogWriter.Instance.LogAsync(db, LogType.Stream,
-                $"Response Publish {{ PublishDto: {JsonFormatter.ToString(data)} }}");
+                $"Response Publish {{ PublishDto: {JsonFormatter.ToString(data)} }}" +
+                $"[{statusCode}]: {JsonFormatter.ToString(response)}");
             return new ApiResponseBuilder(request, statusCode, response, message).Build();
         }
     }
