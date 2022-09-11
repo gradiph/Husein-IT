@@ -1,5 +1,4 @@
-﻿using CommonJson;
-using MessageBus.Models;
+﻿using MessageBus.Models;
 
 namespace BackOfficeWeb.Models.MessageBus
 {
