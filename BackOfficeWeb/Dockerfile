@@ -11,10 +11,10 @@ COPY ["BackOfficeWeb/BackOfficeWeb.csproj", "BackOfficeWeb/"]
 RUN dotnet restore "BackOfficeWeb/BackOfficeWeb.csproj"
 COPY . .
 WORKDIR "/src/BackOfficeWeb"
-RUN dotnet build "BackOfficeWeb.csproj" -c Release -o /app/build
+RUN dotnet build "BackOfficeWeb.csproj" -c Debug -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "BackOfficeWeb.csproj" -c Release -o /app/publish
+RUN dotnet publish "BackOfficeWeb.csproj" -c Debug -o /app/publish
 
 FROM base AS final
 WORKDIR /app
