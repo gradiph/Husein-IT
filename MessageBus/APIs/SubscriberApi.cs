@@ -95,7 +95,7 @@ namespace MessageBus.APIs
                 try
                 {
                     subscriber = await db.Subscribers
-                        .Where(s => s.DeletedAt != null && s.Id == id)
+                        .Where(s => s.DeletedAt == null && s.Id == id)
                         .Include(s => s.Channels.Where(c => c.DeletedAt == null))
                         .Include(s => s.Messages)
                         .FirstAsync();
