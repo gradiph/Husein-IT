@@ -1,4 +1,6 @@
-﻿namespace BackOfficeWeb
+﻿using BackOfficeWeb.Models.MessageBus;
+
+namespace BackOfficeWeb
 {
     public static class RouteSetup
     {

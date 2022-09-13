@@ -1,4 +1,5 @@
-﻿@using BackOfficeWeb.Models.MessageBus
+﻿@using BackOfficeWeb.Extensions;
+@using BackOfficeWeb.Models.MessageBus
 @model ChannelViewModel
 @{
     ViewData["Title"] = "Channels Management";
@@ -12,22 +13,26 @@
     <table class="table">
         <thead>
             <tr>
-                <td>#</td>
-                <td>Name</td>
-                <td>Action</td>
+                <td class="text-center">#</td>
+                <td class="text-center">Name</td>
+                <td class="text-center">Subscribers Count</td>
+                <td class="text-center">Messages Count</td>
+                <td class="text-center">Action</td>
             </tr>
         </thead>
 
         <tbody>
-            @foreach (var obj in Model.Channels)
+            @foreach (var (item, index) in Model.Channels.WithIndex())
             {
                 <tr>
-                    <td>1</td>
-                    <td>First Channel</td>
-                    <td>
-                        <a asp-action="Show" asp-route-id="1" class="btn btn-info">Show</a>
-                        <a asp-action="Edit" asp-route-id="1" class="btn btn-warning">Edit</a>
-                        <a asp-action="Delete" asp-route-id="1" class="btn btn-info">Delete</a>
+                    <td class="text-center">@(index + 1)</td>
+                    <td>@item.name</td>
+                    <td class="text-center">@item.subscribersCount</td>
+                    <td class="text-center">@item.messagesCount</td>
+                    <td class="text-center">
+                        <a asp-action="Show" asp-route-id="@item.id" class="btn btn-info">Show</a>
+                        <a asp-action="Edit" asp-route-id="@item.id" class="btn btn-warning">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.id" class="btn btn-info">Delete</a>
                     </td>
                 </tr>
             }

@@ -1,9 +1,10 @@
-﻿using MessageBus.Models;
+﻿using BackOfficeWeb.Models.MessageBus;
 
 namespace BackOfficeWeb.Interfaces
 {
     public interface IMessageBusService
     {
-        Task<ICollection<Channel>> GetAllChannelsAsync();
+        ValueTask<ICollection<Channel>> GetAllChannelsAsync();
+        ValueTask<Channel> GetChannelAsync(int id);
     }
 }

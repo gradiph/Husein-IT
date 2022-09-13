@@ -18,7 +18,6 @@
     <ProjectReference Include="..\CommonJson\CommonJson.csproj" />
     <ProjectReference Include="..\CommonLog\CommonLog.csproj" />
     <ProjectReference Include="..\CommonMessage\CommonMessage.csproj" />
-    <ProjectReference Include="..\MessageBus\MessageBus.csproj" />
   </ItemGroup>
 
 </Project>

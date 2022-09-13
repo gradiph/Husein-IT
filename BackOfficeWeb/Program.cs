@@ -1,8 +1,8 @@
-global using BackOfficeWeb.Models.MessageBus;
 global using CommonLog;
 global using CommonJson;
 global using CommonMessage;
 using BackOfficeWeb;
+using BackOfficeWeb.Models.MessageBus;
 
 LogWriter.Instance.LogAsync(new ChannelViewModel(), LogType.Trace, "System is starting...");
 
