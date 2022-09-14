@@ -140,7 +140,7 @@ namespace MessageBus.APIs
                 db.Subscribers.Add(subscriber);
                 await db.SaveChangesAsync();
 
-                message = $"/subscriber/{subscriber.Id}";
+                message = $"/subscribers/{subscriber.Id}";
                 response = new JsonResponseBuilder(subscriber).Build<Subscriber>();
             }
             catch (Exception e)

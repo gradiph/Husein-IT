@@ -138,7 +138,7 @@ namespace MessageBus.APIs
                 db.Channels.Add(channel);
                 await db.SaveChangesAsync();
 
-                message = $"/channel/{channel.Id}";
+                message = $"/channels/{channel.Id}";
 
                 response = new JsonResponseBuilder(channel).Build<Channel>();
             }
