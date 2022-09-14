@@ -6,5 +6,6 @@ namespace BackOfficeWeb.Interfaces
     {
         ValueTask<ICollection<Channel>> GetAllChannelsAsync();
         ValueTask<Channel> GetChannelAsync(int id);
+        ValueTask<Channel> CreateChannelAsync(ChannelDto data);
     }
 }

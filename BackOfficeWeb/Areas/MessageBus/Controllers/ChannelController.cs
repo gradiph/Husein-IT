@@ -21,7 +21,14 @@ namespace BackOfficeWeb.Areas.MessageBus.Controllers
             return View(channelViewModel);
         }
 
-        public IActionResult Show()
+        public async Task<IActionResult> Show(int id)
+        {
+            ChannelViewModel channelViewModel = new ChannelViewModel();
+            channelViewModel.Channel = await _messageBusService.GetChannelAsync(id);
+            return View(channelViewModel);
+        }
+
+        public IActionResult Create()
         {
             return View();
         }

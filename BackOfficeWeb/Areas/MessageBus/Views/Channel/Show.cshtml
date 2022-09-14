@@ -1,4 +1,7 @@
-﻿@{
+﻿@using BackOfficeWeb.Extensions;
+@using BackOfficeWeb.Models.MessageBus;
+@model ChannelViewModel
+@{
     ViewData["Title"] = "Show Channel";
 }
 
@@ -6,6 +9,95 @@
     <h1 class="display-4">@ViewData["Title"]</h1>
 </div> <!-- .text-center -->
 
+<div class="float-right">
+    <a asp-action="Index">Back</a>
+</div> <!-- .float-right -->
+
 <div class="container">
-    <a asp-action="Index" class="float-right">Back</a>
+    <div class="row gy-3">
+        <div class="col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        Channel Information
+                    </h4> <!-- .card-title -->
+
+                    <table class="align-middle">
+                        <tr>
+                            <th scope="row">Name</th>
+                            <th> &nbsp; : &nbsp; </th>
+                            <td>@Model.Channel.name</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Created Time</th>
+                            <th> &nbsp; : &nbsp; </th>
+                            <td>@Model.Channel.createdAt</td>
+                        </tr>
+                    </table>
+                </div> <!-- .card-body -->
+            </div> <!-- .card -->
+        </div> <!-- .col-xs-12 -->
+
+        <div class="col-md-6 col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        Subscribers <small class="text-muted">(Total: @Model.Channel.subscribers.Count)</small>
+                    </h4> <!-- .card-title -->
+
+                    <table class="table table-hover table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">URL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (item, index) in Model.Channel.subscribers.WithIndex())
+                            {
+                                <tr>
+                                    <th scope="row">@(index + 1)</th>
+                                    <td>@item.name</td>
+                                    <td>@item.url</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div> <!-- .card-body -->
+            </div> <!-- .card -->
+        </div> <!-- .col-md-6 -->
+
+        <div class="col-md-6 col-xs-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">
+                        Messages <small class="text-muted">(Total: @Model.Channel.messages.Count)</small>
+                    </h4> <!-- .card-title -->
+
+                    <table class="table table-hover table-sm align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Date</th>
+                                <th scope="col">Publisher</th>
+                                <th scope="col">Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var (item, index) in Model.Channel.messages.WithIndex())
+                            {
+                                <tr>
+                                    <th scope="row">@(index + 1)</th>
+                                    <td>@item.createdAt</td>
+                                    <td>@item.publisherName</td>
+                                    <td>@item.data</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div> <!-- .card-body -->
+            </div> <!-- .card -->
+        </div> <!-- .col-md-6 -->
+    </div> <!-- .row -->
 </div> <!-- .container -->
