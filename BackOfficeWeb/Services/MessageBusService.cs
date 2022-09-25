@@ -12,7 +12,6 @@ namespace BackOfficeWeb.Services
         {
             _httpClientFactory = httpClientFactory;
         }
-
         public async ValueTask<ICollection<Channel>> GetAllChannelsAsync()
         {
             LogWriter.Instance.LogAsync(this, LogType.Trace, $"GetAllChannelsAsync start.");
@@ -35,7 +34,6 @@ namespace BackOfficeWeb.Services
             LogWriter.Instance.LogAsync(this, LogType.Trace, $"GetAllChannelsAsync result: {JsonFormatter.ToString(result)}.");
             return result;
         }
-
         public async ValueTask<Channel> GetChannelAsync(int id)
         {
             LogWriter.Instance.LogAsync(this, LogType.Trace, $"GetChannelAsync start with id {id}.");
